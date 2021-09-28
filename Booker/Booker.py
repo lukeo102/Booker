@@ -1,7 +1,5 @@
 import requests
-import json
 import datetime
-import getpass
 import json
 import random
 
@@ -51,7 +49,7 @@ class User:
 
 # Need to set up reading this from a file of multiple (encrypted) login details and picking one at "random"
 guid = "2668930o"
-password = getpass.getpass("Password: ")
+password = ""
 
 #Initilising all of Murphys stuff
 user = User(str(guid), str(password))
@@ -59,7 +57,6 @@ user = User(str(guid), str(password))
 # Read the Seminar rooms from a json file
 with open('rooms.json') as json_file:
     data = json.load(json_file)
-    i = 0
 
 # Pick a random room from the list
 room_index = random.randint(0, len(data) - 1)
@@ -76,18 +73,18 @@ morning_error = False
 # from the json then it sends an error message to the Discord bot
 
 # Morning Slot (9-12)
-while not room_booked or not morning_error: # Loops until the room is booked or it errors
+while not room_booked and not morning_error: # Loops until the room is booked or it errors
     booked = user.book_room(data[room_index]["id"], str(next_week), "08:00", 3) # Try to book a room
-    
+    print(room_index)
     if '{"showLecturer":true,"noTimetable":false}' not in str(booked): # Check if the room was successfully booked
         room_index += 1
         if room_index > len(data) - 1: 
             room_index = 0
-            if room_index == starting_room: # If we have tried to book every room in the json, it errors
-                morning_error = True
+        if room_index == starting_room: # If we have tried to book every room in the json, it errors
+            morning_error = True
     else:
         room_booked = True
-        morning_room = data[room_index]["name"]
+        morning_room = room_index
 
 afternoon_error = False
 room_booked = False
@@ -96,18 +93,18 @@ room_booked = False
 # Afternoon time slot (12-15)
 starting_room = room_index
 
-while not room_booked or not afternoon_error:
+while not room_booked and not afternoon_error:
     booked = user.book_room(data[room_index]["id"], str(next_week), "11:00", 3)
     
-    if '{"showLecturer":true,"noTimetable":false}' not in booked:
+    if '{"showLecturer":true,"noTimetable":false}' not in str(booked):
         room_index += 1
         if room_index > len(data) - 1:
             room_index = 0
-            if room_index == starting_room:
-                afternoon_error = True
+        if room_index == starting_room:
+            afternoon_error = True
     else:
         room_booked = True
-        afternoon_room = data[room_index]["name"]
+        afternoon_room = room_index
 
 # This will eventually tell the discord bot if the room was booked successfully and what room
 if morning_error: # Morning bookings
