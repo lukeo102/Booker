@@ -4,7 +4,7 @@ TODO
 
     get encryption for passwords
     randomly select an account for a day (that hasn't already been selected for that day)(3 accounts are required for a full booking from 9am till 6pm)
-    confirm the program *actually* works properly
+    confirm the program *actually* works properly - IT WORKS!!
 
 HOW WILL THIS WORK
 
