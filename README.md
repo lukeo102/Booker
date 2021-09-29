@@ -9,5 +9,3 @@ TODO
 HOW WILL THIS WORK
 
     Server runs a script at like 00:01, said script runs this program then discord bot pings people
-
-test

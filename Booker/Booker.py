@@ -47,78 +47,81 @@ class User:
 
 # IDK wtf is above this, THANKS MURPHY YOU LEGEND
 
-# Need to set up reading this from a file of multiple (encrypted) login details and picking one at "random"
-guid = "2668930o"
-password = ""
+class Booker:
 
-#Initilising all of Murphys stuff
-user = User(str(guid), str(password))
+    # For booking, loop until it books a room, if the program loops through all the rooms provided from the json
+    def BookRoom(user, time, day, rooms, room): #time slot (9, 12, 15), day, user, rooms
 
-# Read the Seminar rooms from a json file
-with open('rooms.json') as json_file:
-    data = json.load(json_file)
+        booking_error = False
+        room_booked = False
+        starting_room = room
 
-# Pick a random room from the list
-room_index = random.randint(0, len(data) - 1)
+        while not room_booked and not booking_error: # Loops until the room is booked or it errors
+            
+            booked = user.book_room(rooms[room]["id"], day, time, 3) # Try to book a room
+           
+            if '{"showLecturer":true,"noTimetable":false}' not in str(booked): # Check if the room was successfully booked
+                room += 1
+               
+                if room > len(rooms) - 1: # If we exceeded the 
+                    room = 0
+               
+                if room == starting_room: # If we have tried to book every room in the json, it errors
+                    return False
+            
+            else:
+                room_booked = True
 
-# Setting some variable to prep for the booking section
-starting_room = room_index
-next_week = datetime.date.today() + datetime.timedelta(days=7)
-room_booked = False
-morning_error = False
+        return room
 
-#booked = user.book_room("1730408", "2021-10-03", "16:00", 1) # A test book for room 408 on Sunday
+    # Need to set up reading this from a file of multiple (encrypted) login details and picking one at "random"
+    guid = "2668930o"
+    password = ""
 
-# For booking, loop until it books a room, if the program loops through all the rooms provided
-# from the json then it sends an error message to the Discord bot
+    #Initilising all of Murphys stuff
+    user = User(str(guid), str(password))
 
-# Morning Slot (9-12)
-while not room_booked and not morning_error: # Loops until the room is booked or it errors
-    booked = user.book_room(data[room_index]["id"], str(next_week), "08:00", 3) # Try to book a room
-    print(room_index)
-    if '{"showLecturer":true,"noTimetable":false}' not in str(booked): # Check if the room was successfully booked
-        room_index += 1
-        if room_index > len(data) - 1: 
-            room_index = 0
-        if room_index == starting_room: # If we have tried to book every room in the json, it errors
-            morning_error = True
-    else:
-        room_booked = True
-        morning_room = room_index
+    # Read the Seminar rooms from a json file
+    with open('rooms.json') as json_file:
+        data = json.load(json_file)
 
-afternoon_error = False
-room_booked = False
+    # Pick a random room from the list
+    room_index = random.randint(0, len(data) - 1)
 
-# This is the same as the morning section - im not commenting this too
-# Afternoon time slot (12-15)
-starting_room = room_index
+    # Setting some variable to prep for the booking section
+    starting_room = room_index
+    next_week = datetime.date.today() + datetime.timedelta(days=7)
+    room_booked = False
+    morning_error = False
 
-while not room_booked and not afternoon_error:
-    booked = user.book_room(data[room_index]["id"], str(next_week), "11:00", 3)
+    #booked = user.book_room("1730408", "2021-10-03", "16:00", 1) # A test book for room 408 on Sunday
+
+    # Morning Slot (9-12)
+    morning_slot = BookRoom(user, "08:00", next_week, data, room_index)
     
-    if '{"showLecturer":true,"noTimetable":false}' not in str(booked):
-        room_index += 1
-        if room_index > len(data) - 1:
-            room_index = 0
-        if room_index == starting_room:
-            afternoon_error = True
+    # Afternoon Slot (12-15)
+    afternoon_slot = BookRoom(user, "11:00", next_week, data, room_index)
+
+    # Evening Slot (15-18)
+    evening_slot = BookRoom(user, "14:00", next_week, data, room_index)
+
+
+    # This will eventually tell the discord bot if the room was booked successfully and what room
+    if morning_slot == False: # Morning bookings
+        print("Unable to book morning time slot")
     else:
-        room_booked = True
-        afternoon_room = room_index
+        print("Morning room booked successfully, room: " + str(data[morning_slot]["name"]))
+    if afternoon_slot == False: # Afternoon Bookings
+        print("Unable to book afternoon time slot")
+    else:
+        print("Afternoon room booked successfully, room: " + str(data[afternoon_slot]["name"]))
+    if evening_slot == False: # Evening Bookings
+        print("Unable to book evening time slot")
+    else:
+        print("Evening room booked successfully, room: " + str(data[evening_slot]["name"]))
 
-# This will eventually tell the discord bot if the room was booked successfully and what room
-if morning_error: # Morning bookings
-    print("unable to book morning time slot")
-else:
-    print("morning room booked successfully, room: " + str(data[morning_room]["name"]))
-if afternoon_error: # Afternoon Bookings
-    print("unable to book afternoon time slot")
-else:
-    print("afternoon room booked successfully, room: " + str(data[afternoon_room]["name"]))
-
-
-# This nasty little bit of code takes a hot minute to execute and lists all the rooms we can book
-"""
-rooms = user.get_rooms()
-print(rooms)
-"""
+    # This nasty little bit of code takes a hot minute to execute and lists all the rooms we can book
+    """
+    rooms = user.get_rooms()
+    print(rooms)
+    """
