@@ -2,7 +2,6 @@ import requests
 import datetime
 import json
 import random
-import getpass
 from time import sleep
 
 class User:
@@ -78,11 +77,14 @@ class Booker:
         return room
 
     # Need to set up reading this from a file of multiple (encrypted) login details and picking one at "random"
-    guid = "2668930o"
-    password = getpass.getpass("password: ")
+    #guid = "2668930o"
+    #password = getpass.getpass("password: ")
 
     #Initilising all of Murphys stuff
-    user = User(str(guid), str(password))
+    #user = User(str(guid), str(password))
+    luke = User("2668930o", os.environ['LUKEPASS'])
+    daniel = User("2661637p", os.environ['DANIELPASS'])
+    lewis = User("2583478b", os.environ['LEWISPASS'])
 
     # Read the Seminar rooms from a json file
     with open('rooms.json') as json_file:
@@ -100,28 +102,28 @@ class Booker:
     #booked = user.book_room("1730408", "2021-10-03", "16:00", 1) # A test book for room 408 on Sunday
 
     # Morning Slot (9-12)
-    morning_slot = BookRoom(user, "08:00", next_week, data, room_index)
-    sleep(1)
+    morning_slot = BookRoom(luke, "08:00", next_week, data, room_index)
+    
     # Afternoon Slot (12-15)
-    afternoon_slot = BookRoom(user, "11:00", next_week, data, room_index)
-    sleep(1)
+    afternoon_slot = BookRoom(daniel, "11:00", next_week, data, room_index)
+    
     # Evening Slot (15-18)
-    evening_slot = BookRoom(user, "14:00", next_week, data, room_index)
+    evening_slot = BookRoom(lewis, "14:00", next_week, data, room_index)
 
 
     # This will eventually tell the discord bot if the room was booked successfully and what room
     if morning_slot == False: # Morning bookings
         print("Unable to book morning time slot")
     else:
-        print("Morning room booked successfully, room: " + str(data[morning_slot]["name"]))
+        print("Morning room booked successfully, room: " + str(data[morning_slot]["name"]) + ". Lukes account.")
     if afternoon_slot == False: # Afternoon Bookings
         print("Unable to book afternoon time slot")
     else:
-        print("Afternoon room booked successfully, room: " + str(data[afternoon_slot]["name"]))
+        print("Afternoon room booked successfully, room: " + str(data[afternoon_slot]["name"]) + ". Daniels account.")
     if evening_slot == False: # Evening Bookings
         print("Unable to book evening time slot")
     else:
-        print("Evening room booked successfully, room: " + str(data[evening_slot]["name"]))
+        print("Evening room booked successfully, room: " + str(data[evening_slot]["name"]) + ". Lewiss account.")
 
     # This nasty little bit of code takes a hot minute to execute and lists all the rooms we can book
     """
