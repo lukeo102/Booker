@@ -2,6 +2,8 @@ import requests
 import datetime
 import json
 import random
+import getpass
+from time import sleep
 
 class User:
     def __init__(self, guid, password):
@@ -57,8 +59,9 @@ class Booker:
         starting_room = room
 
         while not room_booked and not booking_error: # Loops until the room is booked or it errors
-            
+            sleep(1)
             booked = user.book_room(rooms[room]["id"], day, time, 3) # Try to book a room
+            print(booked)
            
             if '{"showLecturer":true,"noTimetable":false}' not in str(booked): # Check if the room was successfully booked
                 room += 1
@@ -76,7 +79,7 @@ class Booker:
 
     # Need to set up reading this from a file of multiple (encrypted) login details and picking one at "random"
     guid = "2668930o"
-    password = ""
+    password = getpass.getpass("password: ")
 
     #Initilising all of Murphys stuff
     user = User(str(guid), str(password))
@@ -98,10 +101,10 @@ class Booker:
 
     # Morning Slot (9-12)
     morning_slot = BookRoom(user, "08:00", next_week, data, room_index)
-    
+    sleep(1)
     # Afternoon Slot (12-15)
     afternoon_slot = BookRoom(user, "11:00", next_week, data, room_index)
-
+    sleep(1)
     # Evening Slot (15-18)
     evening_slot = BookRoom(user, "14:00", next_week, data, room_index)
 
